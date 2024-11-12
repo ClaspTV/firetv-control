@@ -33,13 +33,6 @@
             </intent-filter>
         </activity>
 
-        <!--<service
-            android:name=".ForegroundMonitorService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
-            android:foregroundServiceType="dataSync" />-->
-
         <service
             android:name=".WivuLauncherService"
             android:permission="android.permission.FOREGROUND_SERVICE"
