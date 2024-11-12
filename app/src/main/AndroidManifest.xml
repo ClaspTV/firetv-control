@@ -17,7 +17,7 @@
     <application
         android:name=".WiVuApplication"
         android:allowBackup="true"
-        android:banner=""
+        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
