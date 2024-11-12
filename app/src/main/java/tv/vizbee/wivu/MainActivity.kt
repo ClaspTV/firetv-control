@@ -1,5 +1,6 @@
 package tv.vizbee.wivu
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 
@@ -32,15 +33,9 @@ class MainActivity : FragmentActivity() {
         }
 
         // Uncomment below code to start ForegroundMonitorService if needed for monitoring foreground apps
-        /*
         val serviceIntent = Intent(this, ForegroundMonitorService::class.java)
 
         // Start the foreground service based on OS version compatibility.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent) // Required for Android O and above
-        } else {
-            startService(serviceIntent)
-        }
-        */
+        startForegroundService(serviceIntent) // Required for Android O and above
     }
 }

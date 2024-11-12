@@ -34,6 +34,14 @@
         </activity>
 
         <service
+            android:name=".ForegroundMonitorService"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:foregroundServiceType="shortService"
+            android:enabled="true"
+            android:exported="false" />
+
+
+        <service
             android:name=".WivuLauncherService"
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:foregroundServiceType="shortService"
