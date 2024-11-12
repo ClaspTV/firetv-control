@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.Wivu" parent="@style/Theme.Leanback" />
+</resources>
