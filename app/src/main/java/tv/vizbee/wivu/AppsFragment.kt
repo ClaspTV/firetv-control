@@ -1,5 +1,6 @@
 package tv.vizbee.wivu
 
+import ADBTestFragment
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +38,17 @@ class AppsFragment : Fragment() {
             // Launch the Netflix app or show a message if it is not installed
             launchNetflix(requireContext())
             Log.d("AppsFragment", "Netflix button clicked")
+        }
+
+        val adbCommands: Button = view.findViewById(R.id.adb_commands)
+        adbCommands.setOnClickListener {
+            if (savedInstanceState == null) {
+                // Set up the main UI by adding the AppsFragment to the fragment container.
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_browse_fragment, ADBTestFragment())
+                    .commitNow()
+            }// Execute ADB commands to simulate remote control key presses
+
         }
 
         return view
