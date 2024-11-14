@@ -10,6 +10,8 @@ import android.widget.GridView
 import android.widget.Toast
 import tv.vizbee.wivu.GridAdapter
 import tv.vizbee.wivu.R
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 /**
  * ADBTestFragment is a Fragment that displays a grid of items and allows the user
@@ -74,55 +76,85 @@ class ADBTestFragment : Fragment() {
     /**
      * Executes a series of ADB commands with delays, simulating key events.
      * Each command is logged and executed using a delay to space out the key events.
+     *
+     * Note:
+     *
+     * We are unable to perform specific system-level actions, such as triggering the Home button
+     * and controlling volume, through ADB commands within the app due to permission restrictions.
+     *
+     * Explanation:
+     * - Commands to simulate the Home button press or adjust volume levels (e.g., using `input keyevent KEYCODE_HOME`
+     *   or `input keyevent KEYCODE_VOLUME_UP`) require elevated privileges.
+     * - These commands are restricted and can only be executed by system-level apps or via an external ADB shell,
+     *   as they require permissions not available to regular third-party apps.
      */
     private fun executeADBCommands() {
-        // Handler to delay commands
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_DPAD_DOWN"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 5000) // 5-second delay
+        // Define commands and their delays in a data structure
+        val commands = listOf(
+            "KEYCODE_DPAD_DOWN" to 5000L,
+            "KEYCODE_DPAD_UP" to 10000L,
+            "KEYCODE_DPAD_RIGHT" to 15000L,
+            "KEYCODE_DPAD_LEFT" to 20000L,
+            "KEYCODE_ENTER" to 25000L,
+            "KEYCODE_BACK" to 30000L
+        )
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_DPAD_UP"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 10000) // 10-second delay
+        // Use a single handler instance
+        val handler = Handler(Looper.getMainLooper())
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_DPAD_RIGHT"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 15000) // 15-second delay
+        // Execute commands using a more concise approach
+        commands.forEach { (keycode, delay) ->
+            handler.postDelayed({
+                val command = "input keyevent $keycode"
+                try {
+                    Log.d("ADBTestFragment", "Executing: $command")
+                    Runtime.getRuntime().exec(command)
+                } catch (e: Exception) {
+                    Log.e("ADBTestFragment", "Failed to execute command: $command", e)
+                }
+            }, delay)
+        }
+    }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_DPAD_LEFT"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 20000) // 20-second delay
+    /**
+     * Note:
+     *
+     * Attempted to retrieve the currently running activity within the app using an ADB command
+     * (dumpsys activity activities | grep mResumedActivity), but encountered a permission denial:
+     *
+     * ```
+     * Permission Denial: can't dump ActivityManager from pid=21157, uid=10217
+     * due to missing android.permission.DUMP permission
+     * ```
+     *
+     * Explanation:
+     * - The command "dumpsys activity activities | grep mResumedActivity" is commonly used to get
+     *   the currently resumed activity on the device.
+     * - However, it requires the `android.permission.DUMP` permission, which is a restricted permission.
+     * - This permission is typically only available to system apps and cannot be granted to third-party apps.
+     *
+     */
+    private fun getCurrentActivityRunning() {
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_ENTER"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 25000) // 25-second delay
+        try {
+            // Execute the adb shell command
+            val process =
+                Runtime.getRuntime().exec("dumpsys activity activities | grep mResumedActivity")
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_BACK"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 30000) // 30-second delay
+            // Get the input stream and read the output
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            var line: String?
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_HOME"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 35000) // 35-second delay
+            // Read each line of output and print it
+            while (reader.readLine().also { line = it } != null) {
+                // Print the output of the command
+                Log.d("MainActivity", "Current Activity: $line")
+            }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val command = "input keyevent KEYCODE_MENU"
-            Log.d("ADBTestFragment", command)
-            Runtime.getRuntime().exec(command)
-        }, 40000) // 40-second delay
+            // Wait for the process to finish
+            process.waitFor()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
