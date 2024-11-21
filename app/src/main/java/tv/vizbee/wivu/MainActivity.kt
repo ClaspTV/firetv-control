@@ -1,5 +1,7 @@
 package tv.vizbee.wivu
 
+import android.app.AppOpsManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -40,8 +42,22 @@ class MainActivity : FragmentActivity() {
         // Start the foreground service based on OS version compatibility.
         startForegroundService(serviceIntent) // Required for Android O and above
 
+    }
 
-        if (!Settings.canDrawOverlays(this)) {
+    override fun onResume() {
+        super.onResume()
+        val appOpsManager = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOpsManager.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(),
+            packageName
+        )
+
+        if (mode != AppOpsManager.MODE_ALLOWED) {
+            // Redirect user to the general Usage Access settings page
+            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+            startActivity(intent)
+        } else if (!Settings.canDrawOverlays(this)) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
                 data = Uri.parse("package:${packageName}")
             }
