@@ -28,7 +28,8 @@ class ForegroundMonitorService : Service() {
     private var isMonitoring = false // Tracks whether monitoring is active
     private lateinit var detector: ForegroundAppDetector // Detector for identifying foreground app
     private var monitoringJob: Job? = null // Job for coroutine monitoring task
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + Job()) // Scope for background tasks
+    private val coroutineScope =
+        CoroutineScope(Dispatchers.Default + Job()) // Scope for background tasks
 
     /**
      * Initializes the service.
@@ -64,10 +65,20 @@ class ForegroundMonitorService : Service() {
                     val appName = detector.getAppNameFromPackage(applicationContext, packageName)
                     Log.d("ForegroundMonitor", "Current App: $appName ($packageName)")
                     // Add further handling of foreground app info if needed
+                    if (appName != "Wivu" && appName !="Netflix" && appName != "Settings") {
+                        launchApp()
+                    }
                 }
                 delay(1000) // Delay for 1 second between checks
             }
         }
+    }
+
+    private fun launchApp() {
+        Log.d("ForegroundMonitor", "Relaunch")
+        val launchIntent = Intent(applicationContext, MainActivity::class.java)
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(launchIntent)
     }
 
     /**

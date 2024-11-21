@@ -68,7 +68,7 @@ class AppsFragment : Fragment() {
             context.startActivity(launchIntent)
         } else {
             // Show a message if the Netflix app is not installed
-            Toast.makeText(context, "Netflix app is not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "App is not installed", Toast.LENGTH_SHORT).show()
         }
     }
 }

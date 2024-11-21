@@ -30,8 +30,8 @@ class BootReceiver : BroadcastReceiver() {
             Log.d("BootReceiver", "Boot completed, starting service")
             Toast.makeText(context, "Boot completed, starting service", Toast.LENGTH_LONG).show()
 
-            // Create an Intent to start the WivuLauncherService
-            val serviceIntent = Intent(context, WivuLauncherService::class.java)
+            // Create an Intent to start the ForegroundMonitorService
+            val serviceIntent = Intent(context, ForegroundMonitorService::class.java)
 
             // Start the service as a foreground service for devices running Android O or later
             context.startForegroundService(serviceIntent)

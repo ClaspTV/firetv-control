@@ -1,7 +1,9 @@
 package tv.vizbee.wivu
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.fragment.app.FragmentActivity
 
 
@@ -37,5 +39,13 @@ class MainActivity : FragmentActivity() {
 
         // Start the foreground service based on OS version compatibility.
         startForegroundService(serviceIntent) // Required for Android O and above
+
+
+        if (!Settings.canDrawOverlays(this)) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+                data = Uri.parse("package:${packageName}")
+            }
+            startActivity(intent)
+        }
     }
 }

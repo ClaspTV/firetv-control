@@ -1,7 +1,10 @@
 package tv.vizbee.wivu
 
+import android.app.ActivityManager
 import android.app.Application
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -46,5 +49,44 @@ class WiVuApplication : Application(), DefaultLifecycleObserver {
      */
     override fun onStop(owner: LifecycleOwner) {
         Log.d("WiVuApplication", "App is in the background")
+//        getCurrentForegroundApp()
     }
+
+    private fun getCurrentForegroundApp() {
+        val detector = ForegroundAppDetector() // Initialize the detector
+        val foregroundApp = detector.getForegroundApp(this)
+        foregroundApp?.let { packageName ->
+            val appName = detector.getAppNameFromPackage(this, packageName)
+            Log.d("WiVuApplication", "Current App: $appName ($packageName)")
+            // Add further handling of foreground app info if needed
+            checkCurrentAppIsWiVuSupportedAp(appName)
+        }
+    }
+
+    private fun checkCurrentAppIsWiVuSupportedAp(appName: String) {
+        if (appName == "Netflix") {
+            Log.d(
+                "WiVuApplication",
+                "WiVu supported third party app -> Netflix is in the foreground"
+            )
+        } else {
+            bringAppToForeground(this, packageName)
+        }
+
+    }
+
+    private fun bringAppToForeground(context: Context, packageName: String) {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val recentTasks = activityManager.appTasks
+
+        for (task in recentTasks) {
+            val taskInfo = task.taskInfo
+            if (taskInfo.baseActivity?.packageName == packageName) {
+                task.moveToFront()
+                return
+            }
+        }
+        Toast.makeText(context, "App is not running", Toast.LENGTH_SHORT).show()
+    }
+
 }
